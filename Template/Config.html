@@ -6,14 +6,16 @@
 				<thead> 
 					<tr> 
 						<th>Empresa</th> 
-						<th>Código</th> 
+						<th>Código</th>
+						<th>Acción</th>
 					</tr> 
 				</thead> 
 				<tbody> 
-				{% for key, value in result['Empresas_cliente'] %}
+				{% for value in result['Empresas_cliente'] %}
 					<tr> 
-						<td>{{ value[0] }}</td> 
-						<td>{{ value[1] }}</td> 
+						<td>{{ value['Nombre'] }}</td> 
+						<td>{{ value['Id_empresa'] }}</td>
+						<td><i class="fa fa-minus-square-o fa-3" aria-hidden="true" onclick="Seguir_quitar_valor(2, '{{value['Id_empresa'] }}')"></li></td>
 					</tr> 
 				{% endfor %}
 				</tbody>
@@ -34,12 +36,12 @@
 		</thead> 
 		<tbody> 
 		{% set count = 1 %}
-		{% for key, value in result['Empresas'] %}
-			<form id ="{% print 'registro_form_'+count %}" action="registro" method="post">	
+		{% for value in result['Empresas'] %}
+			<form id ="{% print 'registro_form_'+count|string %}" action="registro" method="post">	
 				<tr> 
-					<td>{{ value[0] }}</td> 
-					<td>{{ value[1] }}</td>
-					<td>{{ value[2] }}</td>				
+					<td>{{ value['Nombre'] }}</td> 
+					<td>{{ value['Codigo'] }}</td>
+					<td><i class="fa fa-plus-square-o fa-3" aria-hidden="true" onclick="Seguir_quitar_valor(1, '{{value['Codigo'] }}')"></li> </td>				
 				</tr>
 			</form>
 			{% set count = count + 1 %}

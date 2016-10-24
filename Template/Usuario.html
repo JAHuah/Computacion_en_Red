@@ -1,35 +1,26 @@
-		<article class="module width_full">
-			<header><h3>Post New Article</h3></header>
-				<div class="module_content">
-						<fieldset>
-							<label>Post Title</label>
-							<input type="text">
-						</fieldset>
-						<fieldset>
-							<label>Content</label>
-							<textarea rows="12"></textarea>
-						</fieldset>
-						<fieldset style="width:48%; float:left; margin-right: 3%;"> <!-- to make two field float next to one another, adjust values accordingly -->
-							<label>Category</label>
-							<select style="width:92%;">
-								<option>Articles</option>
-								<option>Tutorials</option>
-								<option>Freebies</option>
-							</select>
-						</fieldset>
-						<fieldset style="width:48%; float:left;"> <!-- to make two field float next to one another, adjust values accordingly -->
-							<label>Tags</label>
-							<input type="text" style="width:92%;">
-						</fieldset><div class="clear"></div>
-				</div>
-			<footer>
-				<div class="submit_link">
-					<select>
-						<option>Draft</option>
-						<option>Published</option>
-					</select>
-					<input type="submit" value="Publish" class="alt_btn">
-					<input type="submit" value="Reset">
-				</div>
-			</footer>
-		</article><!-- end of post new article -->
+<article class="module width_full">
+	<header><h3>Datos</h3></header>
+		<div class="module_content">
+			<div id="tab2" class="tab_content">
+				<table class="tablesorter" cellspacing="0"> 
+				<thead> 
+					<tr> 
+						<th>Usuario</th> 
+						<th>Password</th>
+						<th>Umbral</th>
+						<th>Actualizar</th>
+					</tr> 
+				</thead> 
+				<tbody> 
+					<tr> 
+						<form id ="form_user" method="post">
+							<td>{{ result['User'] }}</td> 
+							<td><input type="password" name="txt_pass" id="txt_pass" value = {{ result['Pass'] }}/></td>
+							<td><input type="number" name="txt_umbral" id="txt_umbral" value = {{ result['Umbral'] }}/></li></td>
+							<td><i class="fa fa-user-plus" aria-hidden="true" onclick="Actualizar_user('{{ result['User'] }}')"></i></td>
+						</form>
+					</tr> 
+				</tbody>
+				</table>
+		</div>
+</article><!-- end of styles article -->
