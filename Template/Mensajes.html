@@ -1,0 +1,59 @@
+<article class="module width_full" id="Representación">
+	<header><h3 class="tabs_involved">Valores Maximos</h3></header>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+		<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Fecha</th> 
+				<th>Fecha Lectura</th> 
+				<th>Empresa</th> 
+				<th>Valor</th> 
+				<th>Porcentaje</th> 
+			</tr> 
+		</thead> 
+		<tbody> 
+		{% for Dict in maximo %}
+			<tr> 
+				<td>{{ Dict["Actualizacion"] }}</td> 
+				<td>{{ Dict["Hora"] }}</td> 
+				<td>{{ Dict["Id_Empresa"] }}</td> 
+				<td>{{ Dict["Valor"] }}</td> 
+				<td>{{ Dict["Porcentaje"] }}</td> 
+			</tr> 
+		{% endfor %}
+		
+		</tbody>
+		</table>
+		</div><!-- end  -->					
+	</div><!-- end of .tab_container -->
+</article><!-- end of content manager article -->
+<article class="module width_full" id="Representación">
+	<header><h3 class="tabs_involved">Valores Minimos</h3></header>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+		<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Fecha</th> 
+				<th>Fecha Lectura</th> 
+				<th>Empresa</th> 
+				<th>Valor</th> 
+				<th>Porcentaje</th>  
+			</tr> 
+		</thead> 
+		<tbody> 
+		{% for Dict in minimo %}
+			<tr> 
+				<td>{{ Dict["Actualizacion"] }}</td> 
+				<td>{{ Dict["Hora"] }}</td> 
+				<td>{{ Dict["Id_Empresa"] }}</td> 
+				<td>{{ Dict["Valor"] }}</td> 
+				<td>{{ Dict["Porcentaje"] }}</td> 
+			</tr> 
+		{% endfor %}
+		</tbody>
+		</table>
+		</div><!-- end  -->					
+	</div><!-- end of .tab_container -->
+</article><!-- end of content manager article -->
