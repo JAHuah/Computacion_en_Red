@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Cotización Bolsa</title>
+	
+	<link rel="stylesheet" href="../static/css/layout.css" type="text/css" media="screen" />
+	<link href="../static/css/jquery-ui.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+	<!--[if lt IE 9]>
+	<link rel="stylesheet" href="css/ie.css" type="text/css" media="screen" />
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<!-- Metemos las librerias para las apis de google -->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<!-- para el formato de bonito -->
+	<script src="../static/js/external/jquery/jquery.js"></script>
+	<script src="../static/js/jquery-ui.js"></script>
+	<script src="../static/js/js_generales.js"></script>
+	<script src="../static/js/js_funciones.js"></script>
+
+	<!--<script src="../static/js/jquery-1.5.2.min.js" type="text/javascript"></script>-->
+	<script src="../static/js/hideshow.js" type="text/javascript"></script>
+	<script src="../static/js/jquery.tablesorter.min.js" type="text/javascript"></script>
+	<script src="../static/js/jquery.equalHeight.js" type="text/javascript"></script>
+	<script type="text/javascript">
+	$(document).ready(function() 
+    	{ 
+      	  $(".tablesorter").tablesorter(); 
+   	 } 
+	);
+	$(document).ready(function() {
+
+	//When page loads...
+	$(".tab_content").hide(); //Hide all content
+	$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+	$(".tab_content:first").show(); //Show first tab content
+
+	//On Click Event
+	$("ul.tabs li").click(function() {
+
+		$("ul.tabs li").removeClass("active"); //Remove any "active" class
+		$(this).addClass("active"); //Add "active" class to selected tab
+		$(".tab_content").hide(); //Hide all tab content
+
+		var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+		$(activeTab).fadeIn(); //Fade in the active ID content
+		return false;
+	});
+
+});
+    </script>
+    <script type="text/javascript">
+    $(function(){
+        $('.column').equalHeight();
+    });
+</script>
+
+</head>
+
+
+<body>
+
+	<header id="header">
+		<hgroup>
+			<h1 class="site_title"><a href="http://192.168.56.100/">Principal</a></h1>
+		</hgroup>
+	</header> <!-- end of header bar -->
+	
+	<section id="secondary_bar">
+		<div class="user">
+			<p>Bienvenido<!--(<a href="#">3 Messages</a>)--></p>
+		</div>
+		<div class="breadcrumbs_container">
+			<article class="breadcrumbs"><a href="http://192.168.56.100/">Principal</a> <div class="breadcrumb_divider">
+		</div>
+	</section><!-- end of secondary bar -->
+	
+	<aside id="sidebar" class="column">
+		<form class="quick_search">
+			<input type="text" value="Quick Search" onfocus="if(!this._haschanged){this.value=''};this._haschanged=true;">
+		</form>
+		<hr/>
+		<h3>Opciones</h3>
+		<ul class="toggle">
+			<li class="icn_new_article"><a onclick="solicitud('Cotizacion')">Cotización</a></li>
+			<li class="icn_edit_article"><a onclick="solicitud('Config')">Configuración</a></li>
+			<li class="icn_categories"><a onclick="solicitud('Estadisticas')">Estadísticas</a></li>
+		</ul>
+		<h3>Usuario</h3>
+		<ul class="toggle">
+			<li class="icn_profile"><a onclick="solicitud('Datos')">Datos</a></li>
+		</ul>
+	
+		<footer>
+			<hr />
+			<p><strong>Copyright &copy; 2011 Website Admin</strong></p>
+			<!--<p>Theme by <a href="http://www.medialoot.com">MediaLoot</a></p>-->
+		</footer>
+	</aside><!-- end of sidebar -->
+	
+	<section id="main" class="column">	
+		<div id="intercambio">
+			<article class="module width_full">
+			<header><h3>Bienvenido</h3></header>
+				<div class="module_content">
+					<img src="../static/images/Bienvenidos.png" alt="Bienvenidos" height="300" > <!--width="42">-->
+				</div>
+		</article><!-- end of styles article -->
+		</div>
+		<div class="clear"></div>
+	</section>
+	<!-- esto es la ventana emergente de loading -->
+	<div id="dialog-message" title="Procesando" >
+		<p id="mensaje"> Procensando su peticion </p>
+		<img src="../static/images/loading.gif" alt="" name="logo" />
+	</div>
+</body>
+
+</html>

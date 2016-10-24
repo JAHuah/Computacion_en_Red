@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Cotización Bolsa</title>
+	
+	<link rel="stylesheet" href="../static/css/layout.css" type="text/css" media="screen" />
+	<link href="../static/css/jquery-ui.css" rel="stylesheet">
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+	<!--[if lt IE 9]>
+	<link rel="stylesheet" href="css/ie.css" type="text/css" media="screen" />
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<!-- Metemos las librerias para las apis de google -->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<!-- para el formato de bonito -->
+	<script src="../static/js/external/jquery/jquery.js"></script>
+	<script src="../static/js/jquery-ui.js"></script>
+	<script src="../static/js/js_generales.js"></script>
+	<script src="../static/js/js_funciones.js"></script>
+
+	<!--<script src="../static/js/jquery-1.5.2.min.js" type="text/javascript"></script>-->
+	<script src="../static/js/hideshow.js" type="text/javascript"></script>
+	<script src="../static/js/jquery.tablesorter.min.js" type="text/javascript"></script>
+	<script src="../static/js/jquery.equalHeight.js" type="text/javascript"></script>
+	<script type="text/javascript">
+	$(document).ready(function() 
+    	{ 
+      	  $(".tablesorter").tablesorter(); 
+   	 } 
+	);
+	$(document).ready(function() {
+
+	//When page loads...
+	$(".tab_content").hide(); //Hide all content
+	$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+	$(".tab_content:first").show(); //Show first tab content
+
+	//On Click Event
+	$("ul.tabs li").click(function() {
+
+		$("ul.tabs li").removeClass("active"); //Remove any "active" class
+		$(this).addClass("active"); //Add "active" class to selected tab
+		$(".tab_content").hide(); //Hide all tab content
+
+		var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+		$(activeTab).fadeIn(); //Fade in the active ID content
+		return false;
+	});
+
+});
+    </script>
+    <script type="text/javascript">
+    $(function(){
+        $('.column').equalHeight();
+    });
+</script>
+
+</head>
+
+
+<body>
+
+	<header id="header">
+		<hgroup>
+			<h1 class="site_title"><a href="http://192.168.56.100/">Registro</a></h1>
+		</hgroup>
+	</header> <!-- end of header bar -->
+	
+	<section id="main" class="column">	
+		<div id="intercambio">
+			<article class="module width_full" id="Representación">
+				<header><h3 class="tabs_involved">Entrar</h3></header>
+				<div class="tab_container">
+					<div id="tab1" class="tab_content">
+					<table class="tablesorter" cellspacing="0"> 
+					<thead> 
+						<tr> 
+							<th>Registrarse</th> 
+							<th>Entrar</th>
+							<th>Accion</th>
+						</tr> 
+					</thead> 
+					<tbody> 
+						<tr> 
+							<form id ="registro_form" action="registro" method="post">	
+								<td><p>Usuario</p> <input type="text" name="txt_user" id="txt_user"/></td> 
+								<td><p>Contraseña</p> <input type="password" name="txt_pass" id="txt_pass" /></td>
+								<td><i class="fa fa-sign-in fa-6" aria-hidden="true"><a onclick="registro()">Cotización</a></i></td>								
+							</form>
+						</tr> 
+					</tbody>
+					</table>
+					</div><!-- end  -->					
+				</div><!-- end of .tab_container -->
+			</article><!-- end of content manager article -->
+<!-- 			<article class="module width_full" id="Nuevo_user">
+				<header><h3 class="tabs_involved">Registro</h3></header>
+				<div class="tab_container">
+					<div id="tab1" class="tab_content" style="display: block;">
+					<table class="tablesorter" cellspacing="0"> 
+					<thead> 
+						<tr> 
+							<th>Registrarse</th> 
+							<th>Entrar</th> 
+							<th>Accion</th> 
+						</tr> 
+					</thead> 
+					<tbody> 
+						<tr> 
+							<form id ="nuevo_form" action="nuevo" method="post">	
+								<td><p>Nuevo Usuario</p> <input type="text" name="User_new" /></td> 
+								<td><p>Contraseña</p> <input type="pass" name="pass_new" /></td> 
+								<td><i class="fa fa-sign-in fa-6" aria-hidden="true"></i></td>	
+							</form>
+						</tr> 
+					</tbody>
+					</table>
+					</div>
+				</div>
+			</article> -->
+		</div>
+		<div class="clear"></div>
+	</section>
+	<!-- esto es la ventana emergente de loading -->
+	<div id="dialog-message" title="Procesando" >
+		<p id="mensaje"> Procensando su peticion </p>
+		<img src="../static/images/loading.gif" alt="" name="logo" />
+	</div>
+</body>
+
+</html>

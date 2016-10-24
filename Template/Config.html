@@ -1,0 +1,52 @@
+<article class="module width_full">
+	<header><h3>Empresas Seguidas Por Usted</h3></header>
+		<div class="module_content">
+			<div id="tab2" class="tab_content">
+				<table class="tablesorter" cellspacing="0"> 
+				<thead> 
+					<tr> 
+						<th>Empresa</th> 
+						<th>Código</th> 
+					</tr> 
+				</thead> 
+				<tbody> 
+				{% for key, value in result['Empresas_cliente'] %}
+					<tr> 
+						<td>{{ value[0] }}</td> 
+						<td>{{ value[1] }}</td> 
+					</tr> 
+				{% endfor %}
+				</tbody>
+				</table>
+		</div>
+</article><!-- end of styles article -->
+<article class="module width_full" id="Representación">
+	<header><h3 class="tabs_involved">Empresas</h3></header>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+		<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Empresa</th> 
+				<th>Código</th>
+				<th>Accion</th>
+			</tr> 
+		</thead> 
+		<tbody> 
+		{% set count = 1 %}
+		{% for key, value in result['Empresas'] %}
+			<form id ="{% print 'registro_form_'+count %}" action="registro" method="post">	
+				<tr> 
+					<td>{{ value[0] }}</td> 
+					<td>{{ value[1] }}</td>
+					<td>{{ value[2] }}</td>				
+				</tr>
+			</form>
+			{% set count = count + 1 %}
+		{% endfor %}
+		</tbody>
+		</table>
+		</div><!-- end  -->					
+	</div><!-- end of .tab_container -->
+</article><!-- end of content manager article -->
+

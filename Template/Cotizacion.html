@@ -1,0 +1,74 @@
+<article class="module width_full">
+	<header><h3>Gráficas Internas</h3></header>
+		<div class="module_content">
+			<script type="text/javascript">
+			  google.charts.load('current', {'packages':['corechart']});
+			  google.charts.setOnLoadCallback(drawChart);
+
+			  function drawChart() {
+				var data = google.visualization.arrayToDataTable([
+				[ "Posicion",
+				{% set num_result = result|length %}
+				{% set pos_result = 0 %}
+				{% for Dict in result %}
+					"{{ Dict['Nombre'] }}"{% if (pos_result < num_result - 1) %} , {% endif %}
+					{% set pos_result = pos_result + 1 %}
+				  {% endfor %}
+				],
+				{% set num_empresa = coti|length %}
+				{% for pos in range(0,70) %}
+					[ {{pos}} ,
+					{% set pos_coma = 0 %}
+					{% for pos_nom in range(0,num_empresa) %}
+						parseInt({{ coti[nombres[pos_nom]][pos]["Valor"] }}) {% if (pos_coma < num_empresa - 1) %} , {% endif %}
+						{% set pos_coma = pos_coma + 1 %}
+					{% endfor %}
+					] {% if (pos < 69) %} , {% endif %}
+				{% endfor %}
+				]);
+
+				var options = {
+				  title: 'Cotizaciones',
+				  curveType: 'function',
+				  legend: { position: 'bottom' }
+				};
+
+				var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+				chart.draw(data, options);
+			  }
+			</script>
+			<div id="curve_chart" style="width: 900px; height: 500px"></div>
+		</div>
+</article><!-- end of styles article -->
+<article class="module width_full" id="Representación">
+	<header><h3 class="tabs_involved">Gráficas Externas</h3></header>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+		<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Empresa</th> 
+				<th>Código</th> 
+				<th>Cotizacion</th> 
+				<th>Porcentaje</th> 
+			</tr> 
+		</thead> 
+		<tbody> 
+		{% for Dict in result %}
+			<tr> 
+				<td>{{ Dict['Nombre'] }}</td> 
+				<td>{{ Dict['Codigo'] }}</td> 
+				<td><i onclick="Sacamos_Grafica('http://thingspeak.com/channels/{{Dict['Graficas']}}/charts/1?dynamic=true')"
+					class="fa fa-area-chart" style="font-size:24px;color:red"></i></td> 
+				<td><i onclick="Sacamos_Grafica('http://thingspeak.com/channels/{{Dict['Graficas']}}/charts/2?dynamic=true')"
+					class="fa fa-area-chart" style="font-size:24px;color:blue"></i></td> 
+			</tr> 
+		{% endfor %}
+		
+		</tbody>
+		</table>
+		</div><!-- end  -->					
+	</div><!-- end of .tab_container -->
+</article><!-- end of content manager article -->
+
