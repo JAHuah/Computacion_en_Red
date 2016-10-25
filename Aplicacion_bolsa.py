@@ -27,20 +27,26 @@ db = mongoClient.Bolsa
 def index():
 	#devolvemos el main
 	return render_template('index.html', result = dict)
-	
-@app.route('/Config', methods=['POST'])
-def Config():
-	dict ={}
-	#Primero debemos encontrar las empresas que el usuario quiere ver
-	Empresas_cliente = db.RelacionUserEmpresa.find({"Id_user": session['nombre']});
-	#Todas las empresas
-	Empresas = db.Empresas.find();
-	dict['Empresas'] = Empresas
-	dict['Empresas_cliente'] = Empresas_cliente
-	print str(dict['Empresas'])
-	#devolvemos el main
-	return render_template('Config.html', result = dict, pos = 0)
 
+@app.route('/Validar', methods=['POST'])
+def Validar():
+	parametros = request.form
+	respuestas = db.Usuarios.find({"User":parametros['usuario'],"Pass":parametros['pass']});
+	if (respuestas.count() == 1):
+		for respuesta in respuestas:
+			session['id'] = str(respuesta['_id'])
+			session['Porcentaje'] = respuesta['Porcentaje']
+			session['nombre'] = respuesta['User']
+			#print "Sesion: "+str(session)
+			return '1'
+	else:
+		return "Error al Validad los datos" ;
+	
+@app.route('/Principal')
+def Principal():
+	#devolvemos el main
+	return render_template('Principal.html')
+	
 @app.route('/Cotizacion', methods=['POST'])
 def cotizacion():
 	dict = []
@@ -59,13 +65,28 @@ def cotizacion():
 		for Cotizacion in Cotizaciones:
 			coti[Empresa["Id_empresa"]].append(Cotizacion)
 	#devolvemos el main
-	return render_template('Cotizacion.html', result = dict, coti = coti, nombres = nombres)
-	
-@app.route('/Principal')
-def Principal():
+	return render_template('Cotizacion.html', result = dict, coti = coti, nombres = nombres)	
+
+@app.route('/Config', methods=['POST'])
+def Config():
+	dict ={}
+	#Primero debemos encontrar las empresas que el usuario quiere ver
+	Empresas_cliente = db.RelacionUserEmpresa.find({"Id_user": session['nombre']});
+	#Todas las empresas
+	Empresas = db.Empresas.find();
+	dict['Empresas_cliente']=[]
+	for Datos in Empresas_cliente:
+		datos_empresas = db.Empresas.find({"Codigo": Datos["Id_empresa"]}).limit(1);
+		for datos_unicos in datos_empresas:
+			#print str(datos_unicos)
+			Datos['Nombre'] = datos_unicos['Nombre']
+		dict['Empresas_cliente'].append(Datos)
+	dict['Empresas'] = []
+	for Datos in Empresas:
+		dict['Empresas'].append(Datos)
 	#devolvemos el main
-	return render_template('Principal.html')
-	
+	return render_template('Config.html', result = dict)
+
 @app.route('/Estadisticas', methods=['POST'])
 def Estadisticas():
 	coti = {}
@@ -96,25 +117,73 @@ def Estadisticas():
 				coti_ext[Empresa["Id_empresa"]].append(diccionario["field1"])
 			a = np.array(coti_ext[Empresa["Id_empresa"]]).astype(np.float);
 			Externa.append([dato['Nombre'],Empresa['Id_empresa'], np.mean(a), np.median(a) ,np.std(a)])
-			
-	
 	return render_template('Estadisticas.html', result = result, Externa = Externa)
-
-@app.route('/Validar', methods=['POST'])
-def Validar():
+	
+@app.route('/poner', methods=['POST'])
+def poner():
 	parametros = request.form
-	respuestas = db.Usuarios.find({"User":parametros['usuario'],"Pass":parametros['pass']});
-	if (respuestas.count() == 1):
-		for respuesta in respuestas:
-			session['id'] = str(respuesta['_id'])
-			session['Porcentaje'] = respuesta['Porcentaje']
-			session['nombre'] = respuesta['User']
-			print "Sesion: "+str(session)
-			return '1'
+	respuestas = db.RelacionUserEmpresa.find({"Id_empresa": parametros["Id_empresa"]}).limit(1);
+	#si encontramos 1 elemento quiere decir que ya esta asignado por lo tanto no debemos asignarlo
+	if (respuestas.count() == 0):
+		insertar = {"Id_user":session['nombre'],"Id_empresa": parametros["Id_empresa"]}
+		print str(insertar)
+		db.RelacionUserEmpresa.insert_one(insertar)
+		return 'La operación se ha realizado correctamente'
 	else:
-		return '0';
-	
-	
+		return "No se ha podido realizar la operación, el dato o no es valido o se encuentra ya insertado";
+
+@app.route('/quitar', methods=['POST'])
+def quitar():
+	parametros = request.form
+	respuestas = db.RelacionUserEmpresa.find({"Id_empresa": parametros["Id_empresa"]}).limit(1);
+	#si encontramos 1 elemento quiere decir que ya esta asignado por lo tanto no debemos asignarlo
+	if (respuestas.count() > 0):
+		eliminar = {"Id_user":session['nombre'],"Id_empresa": parametros["Id_empresa"]}
+		db.RelacionUserEmpresa.remove(eliminar)
+		return 'La operación se ha realizado correctamente'
+	else:
+		return "No se ha podido realizar la operación, el dato o no es valido o se encuentra ya insertado";
+
+@app.route('/Usuario', methods=['POST'])
+def Usuario():
+	#obtenemos todos los datos del usuario
+	respuestas = db.Usuarios.find({"User":session['nombre']});
+	for aux in respuestas:
+		result = aux
+	print str(result)
+	return render_template('Usuario.html',result = result)
+
+@app.route('/Actualizar_user', methods=['POST'])
+def Actualizar_user():
+	#obtenemos los datos
+	parametros = request.form
+	#obtenemos todos los datos del usuario
+	respuestas = db.Usuarios.update({"User":session['nombre']},{"User":session['nombre'], "Pass":parametros['Pass'],"Porcentaje":parametros['Umbral']});
+	return "La operación se ha realizado correctamente"
+
+@app.route('/Mensajes', methods=['POST'])
+def Mensajes():
+	maximo = []
+	minimo = []
+	#primero debemos buscar los datos que queremos
+	Datos_User = db.Usuarios.find({"User": session['nombre']}); #con esto sacamos el umbral
+	Datos_empresa = db.RelacionUserEmpresa.find({"Id_user": session['nombre']}); #con esto sacamos las empresas
+	for Datos in Datos_User:
+		#segundo buscamos las cotizaciones de la empresa
+		for dato_empresa in Datos_empresa:
+			#vamos con los valores internos
+			Cotizaciones = db.Cotizaciones.find({"Id_Empresa": dato_empresa["Id_empresa"]}); #.sort({"Porcentaje":-1});
+			valor_pos = float(Datos['Porcentaje'])
+			valor_negativo = float((-1)*float(Datos['Porcentaje']));
+			for Cotizacion in Cotizaciones:
+				if (float(Cotizacion["Porcentaje"]) >= float(valor_pos)):
+					print "Porcentaje: "+str(Cotizacion["Porcentaje"])+" Porcentaje: "+str(valor_pos)
+					maximo.append(Cotizacion)
+				elif float(Cotizacion["Porcentaje"]) <= float(valor_negativo):
+					print "Porcentaje: "+str(Cotizacion["Porcentaje"])+" Porcentaje: "+str(valor_negativo)
+					minimo.append(Cotizacion)
+	return render_template('Mensajes.html', maximo = maximo, minimo = minimo)
+
 # @app.route('/oauth2callback')
 # def oauth2callback():
 	# flow = client.flow_from_clientsecrets(

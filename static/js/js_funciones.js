@@ -70,3 +70,64 @@ function registro()
 	    })
 	}
 }
+
+function Seguir_quitar_valor(accion, elemento)
+{	
+	//volvemos a poner todo en su sitio para hacer el loading
+	volver_inicio_emergente()
+	//poner visible el loading
+	$( "#dialog-message" ).dialog( "open" );
+	//podimos lo que necesitamos
+	parametros = {"Id_empresa" : elemento}
+	if (accion == 1)
+		web = "/poner";
+	else
+		web = "/quitar";
+	$.ajax({
+		url: web,
+		data: parametros,
+		type: 'POST',
+		success: function(response) {
+			$("#mensaje").html(response)
+		},
+		error: function(req, status, err) {
+			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );
+		}
+	});
+}
+
+function Actualizar_user( User )
+{
+	var caracteres = new Array(" ","%","'");
+	//volvemos a poner todo en su sitio para hacer el loading
+	volver_inicio_emergente()
+	var umbral = $("#txt_umbral").val();
+	var pass = $("#txt_pass").val();
+	//poner visible el loading
+	$( "#dialog-message" ).dialog( "open" );
+	//podimos lo que necesitamos
+	//para eviatar lios quitamos los espacios
+	for (i=0; i<3;i++)
+		pass = pass.replace(/caracteres[i]/gi,"");
+
+	//validaciones previas: comprobar que se ha introducido el usuario y la password
+	if(pass.length == 0 || umbral <= 0){
+		$( "#dialog-message" ).dialog( "open" );
+		$("#mensaje").html("Error: la pass no pueden estar vacios ni el umbral ser menor o igual que 0");
+		return
+	}
+	
+	parametros = {"User" : User, "Pass":pass, "Umbral":umbral}
+	web = "/Actualizar_user";
+	$.ajax({
+		url: web,
+		data: parametros,
+		type: 'POST',
+		success: function(response) {
+			$("#mensaje").html(response)
+		},
+		error: function(req, status, err) {
+			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );
+		}
+	});
+}
