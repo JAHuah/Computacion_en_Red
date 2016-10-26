@@ -1,4 +1,34 @@
 <article class="module width_full">
+<header><h3 class="tabs_involved">Cotizaciones Internas</h3></header>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+		<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Empresa</th> 
+				<th>Código</th> 
+				<th>Valor Actual</th> 
+				<th>Valor Maximo</th>
+				<th>Valor Minimo</th>
+			</tr> 
+		</thead> 
+		<tbody> 
+		{% for nombre in nombres %}
+			<tr> 
+				<td>{{ cotizaciones[nombre][0] }}</td> 
+				<td>{{ cotizaciones[nombre][1] }}</td> 
+				<td>{{ cotizaciones[nombre][2] }}</td> 
+				<td>{{ cotizaciones[nombre][3] }}</td>
+				<td>{{ cotizaciones[nombre][4] }}</td>
+			</tr> 
+		{% endfor %}
+		
+		</tbody>
+		</table>
+		</div><!-- end  -->					
+	</div><!-- end of .tab_container -->
+</article><!-- end of styles article -->
+<article class="module width_full">
 	<header><h3>Gráficas Internas</h3></header>
 		<div class="module_content">
 			<script type="text/javascript">
@@ -20,7 +50,7 @@
 					[ {{pos}} ,
 					{% set pos_coma = 0 %}
 					{% for pos_nom in range(0,num_empresa) %}
-						parseInt({{ coti[nombres[pos_nom]][pos]["Valor"] }}) {% if (pos_coma < num_empresa - 1) %} , {% endif %}
+						parseFloat({{ coti[nombres[pos_nom]][pos]["Valor"] }}) {% if (pos_coma < num_empresa - 1) %} , {% endif %}
 						{% set pos_coma = pos_coma + 1 %}
 					{% endfor %}
 					] {% if (pos < 69) %} , {% endif %}
