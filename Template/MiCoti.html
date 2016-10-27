@@ -1,0 +1,28 @@
+<article class="module width_full" id="Representacion">
+	<header><h3 class="tabs_involved">Compras</h3></header>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+		<table class="tablesorter" cellspacing="0"> 
+			<thead> 
+				<tr> 
+					<th>Compra</th> 
+				</tr> 
+			</thead> 
+			<tbody> 
+				<tr>
+					<td><select id="select_empresa" onchange = "seleccion_grafica_compra()">
+						<option value="0">Seleccione una Compra</option>
+						{% for value in empresas %}
+							<option value="{{ value['Fecha'] }}">{{ value['Empresa'] }}-{{ value['Valor'] }}</option>
+						{% endfor %}
+					</select> </td>
+				</tr>
+			</tbody>
+		</table>
+		</div><!-- end  -->					
+	</div><!-- end of .tab_container -->
+</article><!-- end of content manager article -->
+<article class="module width_full" id="Graficas">
+	<div id="pos_grafica"></div>
+</article>
+

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import json
+import json, time, datetime
 #para operar de forma rapida
 import numpy as np
 #importo libreria para acceso a URL
@@ -217,6 +217,7 @@ def quitar():
 	else:
 		return "No se ha podido realizar la operación, el dato o no es valido o se encuentra ya insertado";
 
+#funcion para visualizar datos de usuario
 @app.route('/Usuario', methods=['POST'])
 def Usuario():
 	#obtenemos todos los datos del usuario
@@ -226,9 +227,14 @@ def Usuario():
 		respuestas = db.Usuarios.find({"User":session['nombre']});
 		for aux in respuestas:
 			result = aux
-		print str(result)
-		return render_template('Usuario.html',result = result)
+		print "Usuario: "+ str(result)
+		empresas = db.Empresas.find();
+		print "empresas ="+str(empresas)
+		compras = db.Compras.find({"Id_user": session['nombre']})
+		print "compras ="+str(compras)
+		return render_template('Usuario.html',result = result, empresas = empresas, compras = compras)
 
+#funcion para actuzalizar el usuario
 @app.route('/Actualizar_user', methods=['POST'])
 def Actualizar_user():
 	#obtenemos los datos
@@ -237,6 +243,7 @@ def Actualizar_user():
 	respuestas = db.Usuarios.update({"User":session['nombre']},{"User":session['nombre'], "Pass":parametros['Pass'],"Porcentaje":parametros['Umbral']});
 	return "La operación se ha realizado correctamente"
 
+#funcion para que el usuario este informado del historio superior e inferior de umbrales
 @app.route('/Mensajes', methods=['POST'])
 def Mensajes():
 	if session.has_key('id') == False:
@@ -251,7 +258,7 @@ def Mensajes():
 			#segundo buscamos las cotizaciones de la empresa
 			for dato_empresa in Datos_empresa:
 				#vamos con los valores internos
-				Cotizaciones = db.Cotizaciones.find({"Id_Empresa": dato_empresa["Id_empresa"]}); #.sort({"Porcentaje":-1});
+				Cotizaciones = db.Cotizaciones.find({"Id_Empresa": dato_empresa["Id_empresa"]}); #.sort("Porcentaje",-1);
 				valor_pos = float(Datos['Porcentaje'])
 				valor_negativo = float((-1)*float(Datos['Porcentaje']));
 				for Cotizacion in Cotizaciones:
@@ -262,7 +269,98 @@ def Mensajes():
 						#print "Porcentaje: "+str(Cotizacion["Porcentaje"])+" Porcentaje: "+str(valor_negativo)
 						minimo.append(Cotizacion)
 		return render_template('Mensajes.html', maximo = maximo, minimo = minimo)
+		
+#funcion para insertar una nueva compra
+@app.route('/insertar_compra', methods=['POST'])
+def insertar_compra():
+	if session.has_key('id') == False:
+		return redirect(url_for('index'));
+	else:
+		try:
+			#obtenemos los datos
+			parametros = request.form
+			#insertamos los valores que hemos recibido
+			dato_insertar = {}
+			dato_insertar["Id_user"] = session['nombre'];
+			dato_insertar["Empresa"] = parametros['Empresa'];
+			dato_insertar["Valor"] = str(parametros['Valor']);
+			dato_insertar["Techo"] = str(parametros['Techo']);
+			dato_insertar["Suelo"] = str(parametros['Suelo']);
+			dato_insertar["Fecha"] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S ')
+			#insertamos el dato ya comprobado
+			db.Compras.insert_one(dato_insertar)
+			return "Operacion realizada correctamente";
+		except:
+			return "Algo no ha ido bien en la inserccion del dato";
 
+#funcion para eliminar compra del usuario
+@app.route('/eliminar_compra', methods=['POST'])
+def eliminar_compra():
+	if session.has_key('id') == False:
+		print "usuario no registrado"
+		return redirect(url_for('index'));
+	else:
+		try:
+			#obtenemos los datos
+			parametros = request.form
+			#insertamos los valores que hemos recibido
+			dato_eliminar = {}
+			dato_eliminar["Fecha"] = str(parametros['Fecha']);
+			dato_eliminar["Id_user"] = str(session['nombre']);
+			#insertamos el dato ya comprobado
+			print "dato a eliminar =" +str(dato_eliminar)
+			db.Compras.remove(dato_eliminar)
+			return "Operacion realizada correctamente";
+		except:
+			return "Algo no ha ido bien en la eliminacion del dato";
+
+@app.route('/micotizacion', methods=['POST'])
+def micotizacion():
+	if session.has_key('id') == False:
+		print "usuario no registrado"
+		return redirect(url_for('index'));
+	else:
+		Datos_empresa = db.Compras.find({"Id_user": session['nombre']}); #con esto sacamos las empresas
+		print str(Datos_empresa)
+		return render_template('MiCoti.html', empresas = Datos_empresa)
+
+@app.route('/selecciongraficacompra', methods=['POST'])
+def selecciongraficacompra():		
+	if session.has_key('id') == False:
+		print "usuario no registrado"
+		return redirect(url_for('index'));
+	else:
+		#obtenemos los datos
+		print "############selecciongraficacompra############"
+		Datos_empresa = []
+		Techos = []
+		Suelos = []
+		comprado = []
+		parametros = request.form
+		compras = db.Compras.find({"Id_user": session['nombre'],"Fecha":parametros['Fecha']})
+		#debemos sacar el valor de cotizacion de la empresa
+		#print "compras = " +str(compras)
+		for compra in compras: 
+			#buscamos las cotizaciones a partir de la compra que he realizado
+			Cotizaciones = db.Cotizaciones.find({"Id_Empresa": compra["Empresa"]}).sort("Fecha",1); 
+			#calculamos el diferencial para que este sea representable por google
+			for Cotizacion in Cotizaciones:
+				#calculamos si ha superado los umbrales
+				print str(Cotizacion) 
+				if ( Cotizacion['Hora'] >= compra['Fecha']):
+					#print "Cotizacion = "+str(Cotizacion)
+					Datos_empresa.append(float(Cotizacion['Valor']) - float(compra["Valor"]))
+					if (float(Cotizacion['Valor'] >= (float(compra["Valor"])*(1 + (float(compra["Techo"])/100))))):
+						Techos.append(Cotizacion)
+					elif (float(Cotizacion['Valor'] < (float(compra["Valor"])*(1 - (float(compra["Suelo"])/100))))):
+						Suelos.append(Cotizacion)
+			comprado.append(compra)		
+		# print str(Datos_empresa) 
+		# print str(Techos)
+		# print str(Suelos)
+		return render_template('MiCotiGraficas.html', compras = comprado, Datos_empresa = Datos_empresa, Techos = Techos, Suelos = Suelos)
+		
+######## salida y eleminzacion de session ##########		
 @app.route('/Salir')
 def Salir():
 	session.pop('id', None);

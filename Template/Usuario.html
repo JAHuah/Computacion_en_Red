@@ -24,3 +24,68 @@
 				</table>
 		</div>
 </article><!-- end of styles article -->
+<article class="module width_full">
+	<header><h3>Nueva Compra</h3></header>
+		<div class="module_content">
+			<div id="tab2" class="tab_content">
+				<table class="tablesorter" cellspacing="0"> 
+				<thead> 
+					<tr> 
+						<th>Empresa</th> 
+						<th>Valor Compra (€)</th>
+						<th>Techo (%)</th>
+						<th>Suelo (%)</th>
+						<th>Actualizar</th>
+					</tr> 
+				</thead> 
+				<tbody> 
+					<tr> 
+						<form id ="form_compra" method="post">
+							<td><select id="select_empresa">
+								<option value="0">Seleccione una empresa</option>
+								{% for value in empresas %}
+									<option value="{{ value['Codigo'] }}">{{ value['Nombre'] }}</option>
+								{% endfor %}
+								</select>
+							</td> 
+							<td><input type="number" name="txt_valor" id="txt_valor" value = ""/></li></td>
+							<td><input type="number" name="txt_techo" id="txt_techo" value = ""/></li></td>
+							<td><input type="number" name="txt_suelo" id="txt_suelo" value = ""/></li></td>
+							
+							<td><i class="fa fa-upload" aria-hidden="true" onclick="nueva_compra()"></i></td>
+						</form>
+					</tr> 
+				</tbody>
+				</table>
+		</div>
+</article><!-- end of styles article -->
+<article class="module width_full">
+	<header><h3>Eliminar Compra</h3></header>
+		<div class="module_content">
+			<div id="tab2" class="tab_content">
+				<table class="tablesorter" cellspacing="0"> 
+				<thead> 
+					<tr> 
+						<th>Empresa</th> 
+						<th>Valor Compra (€)</th>
+						<th>Techo (€)</th>
+						<th>Suelo (€)</th>
+						<th>Eliminar</th>
+					</tr> 
+				</thead> 
+				<tbody> 
+					{% for value in compras %}
+					<tr> 
+						<form id ="form_compra" method="post">
+							<td>{{ value['Empresa'] }}</td> 
+							<td>{{ value['Valor'] }}</td>
+							<td>{{ value['Techo'] }}</td>
+							<td>{{ value['Suelo'] }}</td>
+							<td><i class="fa fa-user-times" aria-hidden="true" onclick="eliminar_compra('{{ value['Fecha'] }}')"></i></td>
+						</form>
+					</tr> 
+					{% endfor %}
+				</tbody>
+				</table>
+		</div>
+</article><!-- end of styles article -->

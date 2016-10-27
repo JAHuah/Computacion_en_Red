@@ -131,3 +131,82 @@ function Actualizar_user( User )
 		}
 	});
 }
+function nueva_compra()
+{
+	//volvemos a poner todo en su sitio para hacer el loading
+	volver_inicio_emergente()
+	var suelo = parseFloat($("#txt_suelo").val());
+	var techo = parseFloat($("#txt_techo").val());
+	var valor = parseFloat($("#txt_valor").val());
+	var codigo = $("#select_empresa").val();
+	//poner visible el loading
+	$( "#dialog-message" ).dialog( "open" );
+	//validaciones previas: comprobar que se ha introducido el usuario y la password
+	if(codigo == 0 ||(suelo.length == 0 || suelo <= 0) || (valor.length == 0 || valor <= 0) || (techo.length == 0 || techo <= 0)){
+		$( "#dialog-message" ).dialog( "open" );
+		$("#mensaje").html("Error: Los valores introducidos son incorrectos");
+		return
+	}
+	
+	parametros = {"Empresa" : codigo, "Valor":valor, "Techo":techo, "Suelo":suelo}
+	web = "/insertar_compra";
+	$.ajax({
+		url: web,
+		data: parametros,
+		type: 'POST',
+		success: function(response) {
+			$("#mensaje").html(response)
+		},
+		error: function(req, status, err) {
+			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );
+		}
+	});
+}
+
+function eliminar_compra(Fecha){
+	volver_inicio_emergente()
+	//poner visible el loading
+	$( "#dialog-message" ).dialog( "open" );
+	parametros = {"Fecha" : Fecha}
+	web = "/eliminar_compra";
+	$.ajax({
+		url: web,
+		data: parametros,
+		type: 'POST',
+		success: function(response) {
+			$("#mensaje").html(response)
+		},
+		error: function(req, status, err) {
+			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );
+		}
+	});
+}
+
+function seleccion_grafica_compra()
+{
+	volver_inicio_emergente()
+	//poner visible el loading
+	$( "#dialog-message" ).dialog( "open" );
+	var Empresa = $("#select_empresa").val();
+	
+	if(Empresa == 0){
+		$( "#dialog-message" ).dialog( "open" );
+		$("#mensaje").html("Error: Los valores introducidos son incorrectos");
+		return
+	}
+
+	parametros = {"Fecha" : Empresa}
+	web = "/selecciongraficacompra";
+	$.ajax({
+		url: web,
+		data: parametros,
+		type: 'POST',
+		success: function(response) {
+			$("#pos_grafica").html(response)
+			$( "#dialog-message" ).dialog( "close" );
+		},
+		error: function(req, status, err) {
+			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );
+		}
+	});
+}

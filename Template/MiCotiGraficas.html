@@ -1,0 +1,109 @@
+<h3>Graficas</h3>
+<div id="tab1" class="tab_content">
+	<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Grafica</th>
+			</tr>
+		</thead> 
+		<tbody> 
+			<tr> 
+				<script type="text/javascript">
+				  google.charts.load('current', {'packages':['corechart']});
+				  google.charts.setOnLoadCallback(drawChart);
+
+				  function drawChart() {
+					var data = google.visualization.arrayToDataTable([
+					[ "Posicion","Diferencial"],
+					{% set num_empresa = coti|length %}
+					{% for pos in range(0,Datos_empresa|length) %}
+						[ {{pos}} ,  parseFloat({{ Datos_empresa[pos] }})] 
+						{% if (pos < Datos_empresa|length -1) %} , {% endif %}
+					{% endfor %}
+					]);
+
+					var options = {
+					  title: 'Cotizaciones',
+					  curveType: 'function',
+					  legend: { position: 'bottom' }
+					};
+
+					var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+					chart.draw(data, options);
+				  }
+				</script>
+				<th><div id="curve_chart" style="width: 400px; height: 200px"></div></th>
+			</tr> 
+		</tbody> 
+	</table>
+</div>
+<h3>Compra</h3>
+<div id="tab2" class="tab_content">
+	<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Empresa</th>
+				<th>Hora</th>
+				<th>Valor</th>
+				<th>Techo (%)</th>
+				<th>Suelo (%)</th>
+			</tr>
+		</thead> 
+		<tbody> 
+			{% for value in compras %}		
+			<tr>
+				<td>{{value['Empresa']}}</td>
+				<td>{{value['Fecha']}}</td>
+				<td>{{value['Valor']}}</td>
+				<td>{{value['Techo']}}</td>
+				<td>{{value['Suelo']}}</td>
+			</tr>
+			{% endfor %}
+		</tbody> 
+	</table> 
+	</table>
+</div>
+<h3>Techos</h3>
+<div id="tab3" class="tab_content">
+	<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Empresa</th>
+				<th>Hora</th>
+				<th>Valor</th>
+			</tr>
+		</thead> 
+		<tbody> 
+			{% for value in Techos %}		
+			<tr>
+				<td>{{value['Id_Empresa']}}</td>
+				<td>{{value['Hora']}}</td>
+				<td>{{value['Valor']}}</td>
+			</tr>
+			{% endfor %}
+		</tbody> 
+	</table> 
+	</table>
+</div>
+<h3>Suelos</h3>
+<div id="tab4" class="tab_content">
+	<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Empresa</th>
+				<th>Hora</th>
+				<th>Valor</th>
+			</tr>
+		</thead> 
+		<tbody> 
+			{% for value in Suelos %}		
+			<tr>
+				<td>{{value['Id_Empresa']}}</td>
+				<td>{{value['Hora']}}</td>
+				<td>{{value['Valor']}}</td>
+			</tr>
+			{% endfor %}
+		</tbody> 
+	</table>
+</div>
