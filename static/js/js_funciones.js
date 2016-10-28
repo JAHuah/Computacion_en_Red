@@ -19,7 +19,8 @@ function solicitud(web)
 		success: function(response) {
 			$("#intercambio").html(response)
 			$( "#dialog-message" ).dialog( "close" );
-		},
+			setInterval(function(){$('#intercambio').load(web)}, 120000) /* time in milliseconds (ie 2 seconds)*/
+		}, 
 		error: function(req, status, err) {
 			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );
 		}
@@ -78,17 +79,23 @@ function Seguir_quitar_valor(accion, elemento)
 	//poner visible el loading
 	$( "#dialog-message" ).dialog( "open" );
 	//podimos lo que necesitamos
-	parametros = {"Id_empresa" : elemento}
 	if (accion == 1)
+	{
+		parametros = {"Id_empresa" : $('#select_cod_empresa').val() }
 		web = "/poner";
+	}
 	else
+	{
+		parametros = {"Id_empresa" : elemento}
 		web = "/quitar";
+	}
 	$.ajax({
 		url: web,
 		data: parametros,
 		type: 'POST',
 		success: function(response) {
-			$("#mensaje").html(response)
+			$( "#dialog-message" ).dialog( "close" );
+			$("#empresas_seguidas").html(response)
 		},
 		error: function(req, status, err) {
 			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );
@@ -155,7 +162,8 @@ function nueva_compra()
 		data: parametros,
 		type: 'POST',
 		success: function(response) {
-			$("#mensaje").html(response)
+			$( "#dialog-message" ).dialog( "close" );
+			$("#elementos_comprados_art").html(response)
 		},
 		error: function(req, status, err) {
 			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );
@@ -174,7 +182,8 @@ function eliminar_compra(Fecha){
 		data: parametros,
 		type: 'POST',
 		success: function(response) {
-			$("#mensaje").html(response)
+			$( "#dialog-message" ).dialog( "close" );
+			$("#elementos_comprados_art").html(response)
 		},
 		error: function(req, status, err) {
 			$( "#mensaje" ).dialog( req+"->"+status+"->"+err );

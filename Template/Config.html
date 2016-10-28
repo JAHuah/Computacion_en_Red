@@ -1,4 +1,4 @@
-<article class="module width_full">
+<article class="module width_full" id="empresas_seguidas">
 	<header><h3>Empresas Seguidas Por Usted</h3></header>
 		<div class="module_content">
 			<div id="tab2" class="tab_content">
@@ -35,17 +35,16 @@
 			</tr> 
 		</thead> 
 		<tbody> 
-		{% set count = 1 %}
-		{% for value in result['Empresas'] %}
-			<form id ="{% print 'registro_form_'+count|string %}" action="registro" method="post">	
+			<form id ="registro_form" action="registro" method="post">	
 				<tr> 
-					<td>{{ value['Nombre'] }}</td> 
-					<td>{{ value['Codigo'] }}</td>
-					<td><i class="fa fa-plus-square-o fa-3" aria-hidden="true" onclick="Seguir_quitar_valor(1, '{{value['Codigo'] }}')"></li> </td>				
-				</tr>
+					<td><select id="select_cod_empresa">
+						{% for value in result['Empresas'] %}
+							<option value="{{ value['Codigo'] }}">{{ value['Nombre'] }}</option>
+						{% endfor %}
+					</select> </td>
+					<td><i class="fa fa-plus-square-o fa-3" aria-hidden="true" onclick="Seguir_quitar_valor(1, 0)"></li> </td>
+				</tr>			
 			</form>
-			{% set count = count + 1 %}
-		{% endfor %}
 		</tbody>
 		</table>
 		</div><!-- end  -->					

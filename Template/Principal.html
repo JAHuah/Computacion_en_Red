@@ -31,32 +31,24 @@
    	 } 
 	);
 	$(document).ready(function() {
+		//When page loads...
+		$(".tab_content").hide(); //Hide all content
+		$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+		$(".tab_content:first").show(); //Show first tab content
 
-	//When page loads...
-	$(".tab_content").hide(); //Hide all content
-	$("ul.tabs li:first").addClass("active").show(); //Activate first tab
-	$(".tab_content:first").show(); //Show first tab content
+		//On Click Event
+		$("ul.tabs li").click(function() {
 
-	//On Click Event
-	$("ul.tabs li").click(function() {
+			$("ul.tabs li").removeClass("active"); //Remove any "active" class
+			$(this).addClass("active"); //Add "active" class to selected tab
+			$(".tab_content").hide(); //Hide all tab content
 
-		$("ul.tabs li").removeClass("active"); //Remove any "active" class
-		$(this).addClass("active"); //Add "active" class to selected tab
-		$(".tab_content").hide(); //Hide all tab content
-
-		var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
-		$(activeTab).fadeIn(); //Fade in the active ID content
-		return false;
+			var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+			$(activeTab).fadeIn(); //Fade in the active ID content
+			return false;
+		});
 	});
-
-});
     </script>
-    <script type="text/javascript">
-    $(function(){
-        $('.column').equalHeight();
-    });
-</script>
-
 </head>
 
 
@@ -82,16 +74,19 @@
 		<h3>Opciones</h3>
 		<ul class="toggle">
 			<li class="icn_new_article"><a onclick="solicitud('Cotizacion')">Cotización</a></li>
-			<li class="icn_edit_article"><a onclick="solicitud('Config')">Configuración</a></li>
+			<li class="icn_categories"><a onclick="solicitud('micotizacion')">Mis Cotizaciones</a></li>
 			<li class="icn_categories"><a onclick="solicitud('Estadisticas')">Estadísticas</a></li>
 		</ul>
 		<h3>Usuario</h3>
 		<ul class="toggle">
 			<li class="icn_profile"><a onclick="solicitud('Usuario')">Datos</a></li>
 			<li class="icn_new_article"><a onclick="solicitud('Mensajes')">Mensajes</a></li>
-			<li class="icn_categories"><a onclick="solicitud('micotizacion')">Mis Cotizaciones</a></li>
+			<li class="icn_edit_article"><a onclick="solicitud('Config')">Configuración</a></li>
 		</ul>
-	
+		<h3>Mensajes Online </h3>
+		<ul class="toggle">
+			<li class="icn_new_article" id="mensaje-sse">Mensajes</li>
+		</ul>
 		<footer>
 			<hr />
 			<p><strong>Copyright &copy; 2011 Website Admin</strong></p>
@@ -114,7 +109,31 @@
 	<div id="dialog-message" title="Procesando" >
 		<p id="mensaje"> Procensando su peticion </p>
 		<img src="../static/images/loading.gif" alt="" name="logo" />
-	</div>
+	</div>	
 </body>
-
 </html>
+<script type="text/javascript">
+$(function(){
+	$('.column').equalHeight();
+});
+//##### mensajes SSE #######
+if(typeof(EventSource) !== "undefined") {
+	//Iniciamos el proceso SSE
+	var source = new EventSource("/SSE");
+	document.getElementById("mensaje-sse").innerHTML =source.onmessage;
+	source.onmessage = function(event) {
+		var texto = new Array();
+		if (event.data.length == 0)
+			document.getElementById("mensaje-sse").innerHTML = "no se ha superado ningun Umbral"
+		else
+		{
+			texto = event.data.split("|")
+			document.getElementById("mensaje-sse").innerHTML = ""
+			for (pos in texto)
+				document.getElementById("mensaje-sse").innerHTML += texto[pos]+ "<br>";
+		}
+	};
+} else {
+	document.getElementById("mensaje-sse").innerHTML ="Su navegador no admite mensajes SSE, las notificaciones no seran aceptadas";
+}
+</script>

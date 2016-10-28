@@ -4,91 +4,91 @@ $( function() {
 	  collapsible: true
 	});
 } );
-</script>
-<div class="tab_container" id="accordion">
-	<h3>Numericas</h3>
-	<div id="tab1" class="tab_content">
-		<table class="tablesorter" cellspacing="0">  
-		<thead> 
-			<tr> 
-				<th>Empresa</th> 
-				<th>Código</th> 
-				<th>Valor Actual</th> 
-				<th>Valor Maximo</th>
-				<th>Valor Minimo</th>
-			</tr> 
-		</thead> 
-		<tbody> 
-		{% for nombre in nombres %}
-			<tr> 
-				<td>{{ cotizaciones[nombre][0] }}</td> 
-				<td>{{ cotizaciones[nombre][1] }}</td> 
-				<td>{{ cotizaciones[nombre][2] }}</td> 
-				<td>{{ cotizaciones[nombre][3] }}</td>
-				<td>{{ cotizaciones[nombre][4] }}</td>
-			</tr> 
-		{% endfor %}
-		
-		</tbody>
-		</table>
-	</div><!-- end  -->					
-	<h3>Graficas</h3>
-	<div id="tab2" class="tab_content">
-		<table class="tablesorter" cellspacing="0"> 
+</script> 
+<div id = "Actializacion_continua">
+	<div class="tab_container" id="accordion">
+		<h3>Numericas</h3>
+		<div id="tab1" class="tab_content">
+			<table class="tablesorter" cellspacing="0">  
 			<thead> 
 				<tr> 
-   					<th>Gráfica</th>
-				</tr>
+					<th>Empresa</th> 
+					<th>Código</th> 
+					<th>Valor Actual</th> 
+					<th>Valor Maximo</th>
+					<th>Valor Minimo</th>
+					<th>Act. Sistema</th>
+				</tr> 
 			</thead> 
 			<tbody> 
+			{% for nombre in nombres %}
 				<tr> 
-					<script type="text/javascript">
-					  google.charts.load('current', {'packages':['corechart']});
-					  google.charts.setOnLoadCallback(drawChart);
-
-					  function drawChart() {
-						var data = google.visualization.arrayToDataTable([
-						[ "Posicion",
-						{% set num_result = result|length %}
-						{% set pos_result = 0 %}
-						{% for Dict in result %}
-							"{{ Dict['Nombre'] }}"{% if (pos_result < num_result - 1) %} , {% endif %}
-							{% set pos_result = pos_result + 1 %}
-						  {% endfor %}
-						],
-						{% set num_empresa = coti|length %}
-						{% for pos in range(0,70) %}
-							[ {{pos}} ,
-							{% set pos_coma = 0 %}
-							{% for pos_nom in range(0,num_empresa) %}
-								parseFloat({{ coti[nombres[pos_nom]][pos]["Valor"] }}) {% if (pos_coma < num_empresa - 1) %} , {% endif %}
-								{% set pos_coma = pos_coma + 1 %}
-							{% endfor %}
-							] {% if (pos < 69) %} , {% endif %}
-						{% endfor %}
-						]);
-
-						var options = {
-						  title: 'Cotizaciones',
-						  curveType: 'function',
-						  legend: { position: 'bottom' }
-						};
-
-						var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-						chart.draw(data, options);
-					  }
-					</script>
-					<th><div id="curve_chart" style="width: 400px; height: 200px"></div></th>
+					<td>{{ cotizaciones[nombre][0] }}</td> 
+					<td>{{ cotizaciones[nombre][1] }}</td> 
+					<td><p id = "valor_actual_{{ cotizaciones[nombre][0] }}" >{{ cotizaciones[nombre][2] }}</p></td> 
+					<td><p id = "valor_Max_{{ cotizaciones[nombre][0] }}" >{{ cotizaciones[nombre][3] }}</p></td>
+					<td><p id = "valor_Min_{{ cotizaciones[nombre][0] }}" >{{ cotizaciones[nombre][4] }}</p></td>
+					<td><{{ cotizaciones[nombre][5] }}</p></td>
 				</tr> 
-			</tbody> 
-			</table>
-
-			</div><!-- end of #tab2 -->
+			{% endfor %}
 			
-		</div><!-- end of .tab_container -->
-		</div>
-</article><!-- end of styles article -->
+			</tbody>
+			</table>
+		</div><!-- end  -->					
+		<h3>Graficas</h3>
+		<div id="tab2" class="tab_content">
+			<table class="tablesorter" cellspacing="0"> 
+				<thead> 
+					<tr> 
+						<th>Gráfica</th>
+					</tr>
+				</thead> 
+				<tbody> 
+					<tr> 
+						<script type="text/javascript">
+						  google.charts.load('current', {'packages':['corechart']});
+						  google.charts.setOnLoadCallback(drawChart);
+
+						  function drawChart() {
+							var data = google.visualization.arrayToDataTable([
+							[ "Posicion",
+							{% set num_result = result|length %}
+							{% set pos_result = 0 %}
+							{% for Dict in result %}
+								"{{ Dict['Nombre'] }}"{% if (pos_result < num_result - 1) %} , {% endif %}
+								{% set pos_result = pos_result + 1 %}
+							  {% endfor %}
+							],
+							{% set num_empresa = coti|length %}
+							{% for pos in range(0,70) %}
+								[ {{pos}} ,
+								{% set pos_coma = 0 %}
+								{% for pos_nom in range(0,num_empresa) %}
+									parseFloat({{ coti[nombres[pos_nom]][pos]["Valor"] }}) {% if (pos_coma < num_empresa - 1) %} , {% endif %}
+									{% set pos_coma = pos_coma + 1 %}
+								{% endfor %}
+								] {% if (pos < 69) %} , {% endif %}
+							{% endfor %}
+							]);
+
+							var options = {
+							  title: 'Cotizaciones',
+							  curveType: 'function',
+							  legend: { position: 'bottom' }
+							};
+
+							var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+							chart.draw(data, options);
+						  }
+						</script>
+						<th><div id="curve_chart" style="width: 400px; height: 200px"></div></th>
+					</tr> 
+				</tbody> 
+			</table>
+		</div><!-- end of #tab2 -->			
+	</div><!-- end of .tab_container -->
+</div>
 <article class="module width_full" id="Representación">
 	<header><h3 class="tabs_involved">Gráficas Externas</h3></header>
 	<div class="tab_container">

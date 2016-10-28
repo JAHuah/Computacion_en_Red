@@ -6,7 +6,7 @@ import numpy as np
 #importo libreria para acceso a URL
 import urllib2, urllib
 #libreria para flask
-from flask import Flask, session, render_template, url_for, request, redirect
+from flask import Flask, session, render_template, url_for, request, redirect, Response
 #importamos libreria de mongo
 from pymongo import MongoClient
 #para convertir str a diccionario
@@ -14,6 +14,9 @@ import ast
 #para el tema de autorizaciones
 from oauth2client.client import flow_from_clientsecrets
 from pydrive.auth import GoogleAuth
+#importo librerbia de tiempo
+import time
+import datetime
 
 
 #VARIABLES DE USO GENERAL
@@ -90,7 +93,7 @@ def Principal():
 	else:
 		return render_template('Principal.html')
 	
-@app.route('/Cotizacion', methods=['POST'])
+@app.route('/Cotizacion', methods=['POST', 'GET'])
 def cotizacion():
 	if session.has_key('id') == False:
 		return redirect(url_for('index'));
@@ -129,8 +132,10 @@ def cotizacion():
 			dato = db.Cotizaciones.find({"Id_Empresa": Empresa["Id_empresa"]}).sort("Valor",1).limit(1);
 			for dat in dato:
 				cotizacion[Empresa["Id_empresa"]].append(dat['Valor'])
-		print "Cotizacion = "+str(cotizacion)
+			cotizacion[Empresa["Id_empresa"]].append(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S '))
+		print "Cotizacion = "+str(cotizacion)	
 		#devolvemos el main
+		#print str(render_template('Cotizacion.html', result = dict, coti = coti, nombres = nombres, cotizaciones = cotizacion)).encode("utf-8")
 		return render_template('Cotizacion.html', result = dict, coti = coti, nombres = nombres, cotizaciones = cotizacion)	
 
 @app.route('/Config', methods=['POST'])
@@ -138,22 +143,7 @@ def Config():
 	if session.has_key('id') == False:
 		return redirect(url_for('index'));
 	else:
-		dict ={}
-		#Primero debemos encontrar las empresas que el usuario quiere ver
-		Empresas_cliente = db.RelacionUserEmpresa.find({"Id_user": session['nombre']});
-		#Todas las empresas
-		Empresas = db.Empresas.find();
-		dict['Empresas_cliente']=[]
-		for Datos in Empresas_cliente:
-			datos_empresas = db.Empresas.find({"Codigo": Datos["Id_empresa"]}).limit(1);
-			for datos_unicos in datos_empresas:
-				#print str(datos_unicos)
-				Datos['Nombre'] = datos_unicos['Nombre']
-			dict['Empresas_cliente'].append(Datos)
-		dict['Empresas'] = []
-		for Datos in Empresas:
-			dict['Empresas'].append(Datos)
-		#devolvemos el main
+		dict = buscador_empresas()
 		return render_template('Config.html', result = dict)
 
 @app.route('/Estadisticas', methods=['POST'])
@@ -201,9 +191,10 @@ def poner():
 		insertar = {"Id_user":session['nombre'],"Id_empresa": parametros["Id_empresa"]}
 		print str(insertar)
 		db.RelacionUserEmpresa.insert_one(insertar)
-		return 'La operación se ha realizado correctamente'
+		dict = buscador_empresas()
+		return render_template('poner.html', result = dict)
 	else:
-		return "No se ha podido realizar la operación, el dato o no es valido o se encuentra ya insertado";
+		return "No se ha podido realizar la operacion, el dato o no es valido o se encuentra ya insertado";
 
 @app.route('/quitar', methods=['POST'])
 def quitar():
@@ -213,9 +204,11 @@ def quitar():
 	if (respuestas.count() > 0):
 		eliminar = {"Id_user":session['nombre'],"Id_empresa": parametros["Id_empresa"]}
 		db.RelacionUserEmpresa.remove(eliminar)
-		return 'La operación se ha realizado correctamente'
+		dict = buscador_empresas()
+		print "dict =" + str(dict)
+		return render_template('poner.html', result = dict)
 	else:
-		return "No se ha podido realizar la operación, el dato o no es valido o se encuentra ya insertado";
+		return "No se ha podido realizar la operacion, el dato o no es valido o se encuentra ya insertado";
 
 #funcion para visualizar datos de usuario
 @app.route('/Usuario', methods=['POST'])
@@ -276,7 +269,7 @@ def insertar_compra():
 	if session.has_key('id') == False:
 		return redirect(url_for('index'));
 	else:
-		try:
+		# try:
 			#obtenemos los datos
 			parametros = request.form
 			#insertamos los valores que hemos recibido
@@ -286,12 +279,13 @@ def insertar_compra():
 			dato_insertar["Valor"] = str(parametros['Valor']);
 			dato_insertar["Techo"] = str(parametros['Techo']);
 			dato_insertar["Suelo"] = str(parametros['Suelo']);
-			dato_insertar["Fecha"] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S ')
+			dato_insertar["Fecha"] = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S '))
 			#insertamos el dato ya comprobado
 			db.Compras.insert_one(dato_insertar)
-			return "Operacion realizada correctamente";
-		except:
-			return "Algo no ha ido bien en la inserccion del dato";
+			compras = db.Compras.find({"Id_user": session['nombre']})
+			return render_template('elementos_comprados.html', compras = compras)
+		# except:
+			# return "Algo no ha ido bien en la inserccion del dato";
 
 #funcion para eliminar compra del usuario
 @app.route('/eliminar_compra', methods=['POST'])
@@ -300,7 +294,7 @@ def eliminar_compra():
 		print "usuario no registrado"
 		return redirect(url_for('index'));
 	else:
-		try:
+		# try:
 			#obtenemos los datos
 			parametros = request.form
 			#insertamos los valores que hemos recibido
@@ -310,9 +304,10 @@ def eliminar_compra():
 			#insertamos el dato ya comprobado
 			print "dato a eliminar =" +str(dato_eliminar)
 			db.Compras.remove(dato_eliminar)
-			return "Operacion realizada correctamente";
-		except:
-			return "Algo no ha ido bien en la eliminacion del dato";
+			compras = db.Compras.find({"Id_user": session['nombre']})
+			return render_template('elementos_comprados.html', compras = compras)
+		# except:
+			# return "Algo no ha ido bien en la eliminacion del dato";
 
 @app.route('/micotizacion', methods=['POST'])
 def micotizacion():
@@ -323,7 +318,7 @@ def micotizacion():
 		Datos_empresa = db.Compras.find({"Id_user": session['nombre']}); #con esto sacamos las empresas
 		print str(Datos_empresa)
 		return render_template('MiCoti.html', empresas = Datos_empresa)
-
+			
 @app.route('/selecciongraficacompra', methods=['POST'])
 def selecciongraficacompra():		
 	if session.has_key('id') == False:
@@ -331,7 +326,6 @@ def selecciongraficacompra():
 		return redirect(url_for('index'));
 	else:
 		#obtenemos los datos
-		print "############selecciongraficacompra############"
 		Datos_empresa = []
 		Techos = []
 		Suelos = []
@@ -350,8 +344,10 @@ def selecciongraficacompra():
 				if ( Cotizacion['Hora'] >= compra['Fecha']):
 					#print "Cotizacion = "+str(Cotizacion)
 					Datos_empresa.append(float(Cotizacion['Valor']) - float(compra["Valor"]))
+					#comprobamos si supera el umbral maximo que hemos puesto
 					if (float(Cotizacion['Valor'] >= (float(compra["Valor"])*(1 + (float(compra["Techo"])/100))))):
 						Techos.append(Cotizacion)
+					#comprobamos supera el umbral minimo puesto
 					elif (float(Cotizacion['Valor'] < (float(compra["Valor"])*(1 - (float(compra["Suelo"])/100))))):
 						Suelos.append(Cotizacion)
 			comprado.append(compra)		
@@ -360,6 +356,53 @@ def selecciongraficacompra():
 		# print str(Suelos)
 		return render_template('MiCotiGraficas.html', compras = comprado, Datos_empresa = Datos_empresa, Techos = Techos, Suelos = Suelos)
 		
+######## SSE mensajes emergentes ##########
+@app.route('/SSE', methods=['GET'])
+def SSE():
+	compras = db.Compras.find({"Id_user": session['nombre']})
+	#debemos sacar el valor de cotizacion de la empresa
+	Mensaje = "data: "+str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S '))+"|"
+	for compra in compras: 
+		#buscamos el ultimo valor de la empresa
+		Cotizaciones = db.Cotizaciones.find({"Id_Empresa": compra["Empresa"]}).sort("Hora",-1).limit(1); 
+		#print "Cotizacion = "+str(Cotizacion) 		
+		#calculamos el diferencial para que este sea representable por google
+		for Cotizacion in Cotizaciones:
+			#print "Cotizacion = "+str(Cotizacion)
+			#calculamos si ha superado los umbrales
+			if ( Cotizacion['Hora'] >= compra['Fecha']):
+				#comprobamos si supera el umbral maximo que hemos puesto
+				if (float(Cotizacion['Valor'] >= (float(compra["Valor"])*(1 + (float(compra["Techo"])/100))))):
+					Mensaje = Mensaje + "Techo de Accion "+Cotizacion['Id_Empresa']+" Superado: "+ str (Cotizacion['Valor'])+ "|"
+				#comprobamos supera el umbral minimo puesto
+				elif (float(Cotizacion['Valor'] < (float(compra["Valor"])*(1 - (float(compra["Suelo"])/100))))):
+					Mensaje = Mensaje + "Suelo de Accion "+Cotizacion['Id_Empresa']+" Superado: "+ str (Cotizacion['Valor'])+ "|"
+	#una vez tenemos el mensaje lo devolvemos
+	Mensaje = Mensaje + '\n\n'
+	#print "Mensaje: "+ Mensaje ;
+	return Response(Mensaje, mimetype="text/event-stream") 
+
+#######funciones genericas
+def buscador_empresas():
+	dict ={}
+	#Primero debemos encontrar las empresas que el usuario quiere ver
+	Empresas_cliente = db.RelacionUserEmpresa.find({"Id_user": session['nombre']});
+	#Todas las empresas
+	Empresas = db.Empresas.find();
+	dict['Empresas_cliente']=[]
+	for Datos in Empresas_cliente:
+		datos_empresas = db.Empresas.find({"Codigo": Datos["Id_empresa"]}).limit(1);
+		for datos_unicos in datos_empresas:
+			#print str(datos_unicos)
+			Datos['Nombre'] = datos_unicos['Nombre']
+		dict['Empresas_cliente'].append(Datos)
+	dict['Empresas'] = []
+	for Datos in Empresas:
+		dict['Empresas'].append(Datos)
+	#devolvemos el main
+	return dict;
+
+	
 ######## salida y eleminzacion de session ##########		
 @app.route('/Salir')
 def Salir():

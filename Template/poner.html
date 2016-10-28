@@ -1,0 +1,22 @@
+<header><h3>Empresas Seguidas Por Usted</h3></header>
+<div class="module_content">
+	<div id="tab2" class="tab_content">
+		<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Empresa</th> 
+				<th>Codigo</th>
+				<th>Accion</th>
+			</tr> 
+		</thead> 
+		<tbody> 
+		{% for value in result['Empresas_cliente'] %}
+			<tr> 
+				<td>{{ value['Nombre'] }}</td> 
+				<td>{{ value['Id_empresa'] }}</td>
+				<td><i class="fa fa-minus-square-o fa-3" aria-hidden="true" onclick="Seguir_quitar_valor(2, '{{value['Id_empresa'] }}')"></li></td>
+			</tr> 
+		{% endfor %}
+		</tbody>
+		</table>
+</div>

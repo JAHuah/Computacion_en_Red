@@ -1,0 +1,28 @@
+<header><h3>Eliminar Compra</h3></header>
+<div class="module_content">
+	<div id="tab2" class="tab_content">
+		<table class="tablesorter" cellspacing="0"> 
+		<thead> 
+			<tr> 
+				<th>Empresa</th> 
+				<th>Valor Compra (Euros)</th>
+				<th>Techo (Euros)</th>
+				<th>Suelo (Euros)</th>
+				<th>Eliminar</th>
+			</tr> 
+		</thead> 
+		<tbody> 
+			{% for value in compras %}
+			<tr> 
+				<form id ="form_compra" method="post">
+					<td>{{ value['Empresa'] }}</td> 
+					<td>{{ value['Valor'] }}</td>
+					<td>{{ value['Techo'] }}</td>
+					<td>{{ value['Suelo'] }}</td>
+					<td><i class="fa fa-user-times" aria-hidden="true" onclick="eliminar_compra('{{ value['Fecha'] }}')"></i></td>
+				</form>
+			</tr> 
+			{% endfor %}
+		</tbody>
+		</table>
+</div>

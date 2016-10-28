@@ -9,6 +9,16 @@ $(function() {
 			duration: 100
 		}
     });
+	$("#dialog-message-sse").dialog({
+		autoOpen: false,
+		model: true,
+		width: "auto",
+		height: "auto",
+		show: {
+			effect: "blind",
+			duration: 100
+		}
+    });
 });
 
 function volver_inicio_emergente()
