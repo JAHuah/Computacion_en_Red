@@ -1,0 +1,33 @@
+#! /bin/sh
+# Script ejemplo para arranque de servicios en /etc/init.d/
+#
+
+case "$1" in
+start)
+	echo "Iniciando servicio... "
+	python /home/arppath/Computacion_en_red/Lector_de_cotizaciones/Lector_Bolsa.py 1>/dev/null 2>/tmp/log_lector_datos.log &
+	python /home/arppath/Computacion_en_red/Aplicacion_bolsa.py  1>/tmp/log_server_ok.log 2>/tmp/log_servidor.log &
+	;;
+stop)
+	echo "Deteniendo servicio..."
+	# Aquí comando a ejecutar para detener el servicio
+	ps -ef | grep -i Lector_Bolsa | grep -v grep | awk '{ print $2 }' | xargs sudo kill -9
+	ps -ef | grep -i Aplicacion_bolsa | grep -v grep | awk '{ print $2 }' | xargs sudo kill -9
+	;;
+restart)
+	echo "Deteniendo servicio..."
+        # Aquí comando a ejecutar para detener el servicio
+        ps -ef | grep -i Lector_Bolsa | grep -v grep | awk '{ print $2 }' | xargs sudo kill -9
+        ps -ef | grep -i Aplicacion_bolsa | grep -v grep | awk '{ print $2 }' | xargs sudo kill -9
+        echo "Iniciando servicio... "
+        python /home/arppath/Computacion_en_red/Lector_de_cotizaciones/Lector_Bolsa.py 1>/dev/null 2>/tmp/log_lector_datos.log &
+        python /home/arppath/Computacion_en_red/Aplicacion_bolsa.py  1>/tmp/log_server_ok.log 2>/tmp/log_servidor.log &
+        ;;
+*)
+	echo "Modo de empleo: /etc/init.d/Lector_datos {start|stop}"
+	exit 1
+	;;
+esac
+exit 0
+
+
