@@ -1,0 +1,15 @@
+{
+  "name": "Computacion_en_Red",
+  "scripts": {
+  },
+  "env": {
+  },
+  "formation": {
+  },
+  "addons": [
+
+  ],
+  "buildpacks": [
+
+  ]
+}
