@@ -471,4 +471,5 @@ if __name__ == '__main__':
 	#para iniciar el server
 	app.secret_key = str(uuid.uuid4())
 	app.debug = True
-	app.run(debug=True,host='0.0.0.0')
+	port = os.getenv('PORT',80)
+	app.run(debug=True,host='0.0.0.0',port=port)
