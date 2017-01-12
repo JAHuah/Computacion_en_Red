@@ -12,18 +12,44 @@ from pymongo import MongoClient
 #para convertir str a diccionario
 import ast
 #para el tema de autorizaciones
-from oauth2client.client import flow_from_clientsecrets
-from pydrive.auth import GoogleAuth
+#from oauth2client.client import flow_from_clientsecrets
+#from pydrive.auth import GoogleAuth
 #importo librerbia de tiempo
 import time
 import datetime
+import uuid
+
+import os, random, string
+
+#Para los pusher
+from pysendpulse import PySendPulse
 
 
 #VARIABLES DE USO GENERAL
 app = Flask(__name__, template_folder='Template')
 #variables para base de datos
-mongoClient = MongoClient('127.0.0.1',27017);
-db = mongoClient.Bolsa
+#mongoClient = MongoClient('127.0.0.1',27017);
+mongoClient = MongoClient('mongodb://jahuah:arppath@ds145868.mlab.com:45868/bolsa')
+db = mongoClient.bolsa
+#parametros para iniciar la api de los push
+REST_API_ID = 'd50e4c0566572dbe36fe0996bb43ba14'
+REST_API_SECRET = 'cf33adf4e8441be718192605053fbe0e'
+WEBSITE_ID = '27712'
+TOKEN_STORAGE = 'memcached'
+SPApiProxy = PySendPulse(REST_API_ID, REST_API_SECRET, TOKEN_STORAGE)
+contador = 0
+
+#### Elementos para GOOGLE AOTH
+GOOGLE_LOGIN_CLIENT_ID = "40343427815-670nngo2uklv3e5rj2hv1mfk2akkieps.apps.googleusercontent.com"
+GOOGLE_LOGIN_CLIENT_SECRET = "<your-secret>"
+
+OAUTH_CREDENTIALS={
+        'google': {
+            'id': GOOGLE_LOGIN_CLIENT_ID,
+            'secret': GOOGLE_LOGIN_CLIENT_SECRET
+        }
+}
+
 
 @app.route('/')
 def index():
@@ -42,44 +68,61 @@ def Validar():
 				session['id'] = str(respuesta['_id'])
 				session['Porcentaje'] = respuesta['Porcentaje']
 				session['nombre'] = respuesta['User']
+				session['Push_ID'] = respuesta['Push_ID']
 				print "Sesion: "+str(session)
 				return '1'
-				# dir_json = 'json/'+str(respuesta['json'])
-				# if (autentificar_con_google(dir_json) == 1):
-					# session['id'] = str(respuesta['_id'])
-					# session['Porcentaje'] = respuesta['Porcentaje']
-					# session['nombre'] = respuesta['User']
-					# print "Sesion: "+str(session)
-					# return '1'
-				# else:
-					# return '0'
 		else:
 			return "Error al Validad los datos" ;
 	else:
 		return '1';
-		
-def autentificar_con_google(credenciales):
-	try:
-		gauth = GoogleAuth()
-		# Try to load saved client credentials
-		print str(gauth)
-		gauth.LoadCredentialsFile(credenciales)
-		if gauth.credentials is None:
-			# Authenticate if they're not there
-			gauth.LocalWebserverAuth()
-		elif gauth.access_token_expired:
-			# Refresh them if expired
-			gauth.Refresh()
+
+@app.route('/autentificar_con_google', methods=['POST','GET'])
+def autentificar_con_google():
+	print "session.has_key('id') = "+ str(session.has_key('id'))
+	if session.has_key('id') == False:
+		parametros = request.form
+		respuestas = db.Usuarios.find({"Email":parametros['Email']});
+		if (respuestas.count() == 1):
+			for respuesta in respuestas:
+				#una vez comprobada que la sesion la tengo yo creada
+				session['id'] = str(respuesta['_id'])
+				session['Porcentaje'] = respuesta['Porcentaje']
+				session['nombre'] = respuesta['User']
+				session['Push_ID'] = respuesta['Push_ID']
+				print "Sesion: "+str(session)
+				#activamos al usuario
+				SPApiProxy.push_set_subscription_state(str(respuesta['Push_ID']), 1)
+				return '1'
 		else:
-			# Initialize the saved creds
-			gauth.Authorize()
-		# Save the current credentials to a file
-		gauth.SaveCredentialsFile(credenciales)
-		return 1
-	except (RuntimeError, TypeError, NameError):
-		print("Unexpected error:", sys.exc_info()[0])
-		print "la autentificacion con google no fue correcta"
-		return 0
+			#guardamos el usuario puesto que ya esta validado por google
+			clave = "" 
+			chars = string.letters + string.digits + string.punctuation
+			pwdSize = 20
+			clave.join((random.choice(chars)) for x in range(pwdSize))
+			guardar={
+				'User' : parametros['Name'],
+				'Pass' : clave,
+				'Email': parametros['Email'],
+				'Porcentaje': '0',
+				'Push_ID': "b0bc-b6a0-dc19-3470-0a86-25a5-ad1b-f850",
+				'key': "B44wi10eP5Bm5LRHKID5OCaa",
+				'client_id': "40343427815-4in442nd041m91s4rq199mg290qf36e4.apps.googleusercontent.com",
+				'json': "client_secret_40343427815-670nngo2uklv3e5rj2hv1mfk2akkieps.apps.googleusercontent.com.json"
+			}
+			db.Usuarios.insert_one(guardar)
+			respuestas = db.Usuarios.find({"Email":parametros['Email']});
+			for respuesta in respuestas:
+				#una vez comprobada que la sesion la tengo yo creada
+				session['id'] = str(respuesta['_id'])
+				session['Porcentaje'] = respuesta['Porcentaje']
+				session['nombre'] = respuesta['User']
+				session['Push_ID'] = respuesta['Push_ID']
+				print "Sesion: "+str(session)
+				#activamos al usuario
+				SPApiProxy.push_set_subscription_state(str(respuesta['Push_ID']), 1)
+			return '1'
+	else:
+		return '1';
 	
 	
 	
@@ -351,14 +394,12 @@ def selecciongraficacompra():
 					elif (float(Cotizacion['Valor'] < (float(compra["Valor"])*(1 - (float(compra["Suelo"])/100))))):
 						Suelos.append(Cotizacion)
 			comprado.append(compra)		
-		# print str(Datos_empresa) 
-		# print str(Techos)
-		# print str(Suelos)
 		return render_template('MiCotiGraficas.html', compras = comprado, Datos_empresa = Datos_empresa, Techos = Techos, Suelos = Suelos)
 		
 ######## SSE mensajes emergentes ##########
 @app.route('/SSE', methods=['GET'])
 def SSE():
+	global contador
 	compras = db.Compras.find({"Id_user": session['nombre']})
 	#debemos sacar el valor de cotizacion de la empresa
 	Mensaje = "data: "+str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S '))+"|"
@@ -380,8 +421,23 @@ def SSE():
 	#una vez tenemos el mensaje lo devolvemos
 	Mensaje = Mensaje + '\n\n'
 	#print "Mensaje: "+ Mensaje ;
+	
+	if (contador > 60):
+		#aqui insertamos tambien el mensaje para que sea enviado por pusher# Create new push task
+		SPApiProxy.push_create('Alerta', WEBSITE_ID, "Mensaje", '10',{'link':"http://jahserver.westeurope.cloudapp.azure.com/Principal"} ) #{'filter_lang':'es', 'filter':  '{"variable_name":"some","operator":"or","conditions":[{"condition":"likewith","value":"a"},{"condition":"notequal","value":"b"}]}'})
+		#SPApiProxy.push_get_websites()
+		contador = 0;
+	else:
+		contador = contador + 1;
+	
 	return Response(Mensaje, mimetype="text/event-stream") 
 
+### PAra google
+@app.route('/google6faf68624ae88dff.html')
+def comprobar():
+	return render_template('google6faf68624ae88dff.html')
+	
+	
 #######funciones genericas
 def buscador_empresas():
 	dict ={}
@@ -408,10 +464,11 @@ def buscador_empresas():
 def Salir():
 	session.pop('id', None);
 	print "Session = "+str(session)
+	#activamos al usuario
 	return redirect(url_for('index'));
 	
 if __name__ == '__main__':
-	import uuid
+	#para iniciar el server
 	app.secret_key = str(uuid.uuid4())
 	app.debug = True
 	app.run(debug=True,host='0.0.0.0',port=80)

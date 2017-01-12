@@ -72,6 +72,32 @@ function registro()
 	}
 }
 
+function onSignIn(googleUser) {
+	var profile = googleUser.getBasicProfile();
+	console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+	console.log('Name: ' + profile.getName());
+	console.log('Image URL: ' + profile.getImageUrl());
+	console.log('Email: ' + profile.getEmail());
+	//2º mandamos la información para validar el user/pass
+	parametros= {"Name" : profile.getName(), "Email" : profile.getEmail()}
+	$.ajax({
+		url:"/autentificar_con_google",
+		dataType : "json",//el tipo de datos
+		data : parametros,
+		type: "POST",
+		success: function(opciones){
+			if(opciones == 1){ //todo correcto
+				$( "#dialog-message" ).dialog( "close" );
+				document.location.href="/Principal";
+			}
+			else
+			{
+				$("#mensaje").html("Error: El usuario y/o clave no son correcto");
+			}
+		}
+	})
+}
+
 function Seguir_quitar_valor(accion, elemento)
 {	
 	//volvemos a poner todo en su sitio para hacer el loading

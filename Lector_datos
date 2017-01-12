@@ -5,8 +5,8 @@
 case "$1" in
 start)
 	echo "Iniciando servicio... "
-	python /home/arppath/Computacion_en_red/Lector_de_cotizaciones/Lector_Bolsa.py 1>/dev/null 2>/tmp/log_lector_datos.log &
-	python /home/arppath/Computacion_en_red/Aplicacion_bolsa.py  1>/tmp/log_server_ok.log 2>/tmp/log_servidor.log &
+	python /home/j.alvarez//Computacion_en_Red/Lector_de_cotizaciones/Lector_Bolsa.py 1>/dev/null &
+	python /home/j.alvarez/Computacion_en_Red/Aplicacion_bolsa.py &
 	;;
 stop)
 	echo "Deteniendo servicio..."
@@ -20,11 +20,11 @@ restart)
         ps -ef | grep -i Lector_Bolsa | grep -v grep | awk '{ print $2 }' | xargs sudo kill -9
         ps -ef | grep -i Aplicacion_bolsa | grep -v grep | awk '{ print $2 }' | xargs sudo kill -9
         echo "Iniciando servicio... "
-        python /home/arppath/Computacion_en_red/Lector_de_cotizaciones/Lector_Bolsa.py 1>/dev/null 2>/tmp/log_lector_datos.log &
-        python /home/arppath/Computacion_en_red/Aplicacion_bolsa.py  1>/tmp/log_server_ok.log 2>/tmp/log_servidor.log &
+        python /home/j.alvarez/Computacion_en_Red/Lector_de_cotizaciones/Lector_Bolsa.py 1>/dev/null &
+        python /home/j.alvarez/Computacion_en_Red/Aplicacion_bolsa.py  &
         ;;
 *)
-	echo "Modo de empleo: /etc/init.d/Lector_datos {start|stop}"
+	echo "Modo de empleo: /etc/init.d/Lector_datos {start|stop|restart}"
 	exit 1
 	;;
 esac

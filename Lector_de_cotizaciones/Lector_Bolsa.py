@@ -93,9 +93,11 @@ def buscar_e_insertar(empresa, db):
 #esperamos a que arranque mongo
 time.sleep(60);
 # PASO 1: Conexión al Server de MongoDB Pasandole el host y el puerto
-mongoClient = MongoClient('127.0.0.1',27017);
+#mongoClient = MongoClient('127.0.0.1',27017);
+mongoClient = MongoClient('mongodb://jahuah:arppath@ds145868.mlab.com:45868/bolsa')
 # PASO 2: Conexión a la base de datos
-db = mongoClient.Bolsa
+db = mongoClient.bolsa
+db.test_database
 # Obtenemos las empresas que vamos a leer y su respectivos codigo
 empresas = db.Empresas.find()
 #empezamos a leer datos e introducirlo
