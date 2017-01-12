@@ -24,9 +24,6 @@ requests==2.2.1
 rsa==3.4.2
 six==1.10.0
 ssh-import-id==3.21
-Twisted-Core==13.2.0
-Twisted-Names==13.2.0
-Twisted-Web==13.2.0
 uritemplate==3.0.0
 urllib3==1.7.1
 Werkzeug==0.11.13
